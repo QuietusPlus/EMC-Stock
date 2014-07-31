@@ -523,7 +523,6 @@ class CGuiCharacter extends CGuiPanel
 						playerLevel = j;
 				}
 				
-				// EMC - Always display mutagen slots
 				if ( mutagentsSlotsNum > 1 )
 				{
 					mutagentsSlotsNum = 1;
