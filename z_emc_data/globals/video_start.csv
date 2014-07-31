@@ -1,7 +1,2 @@
 EFIGS;GOG;ATARI;ROW;PL;RU;CZ;HU;JA;TW;DD;ATARI_DD;AU;NA;JP
-bumpers_EU;bumpers_GOG;bumpers_NA;bumpers_EU;bumpers_PL;bumpers_RU;bumpers_CZ;bumpers_HU;cf;bumpers_EU;bumpers_PL;bumpers_NA;bumpers_EU;bumpers_NA;cf
-intro;intro;intro;intro;intro;intro;intro;intro;nvidia;intro;intro;intro;intro;intro;nvidia
-;;;;;;;;middleware;;;;;;middleware
-;;;;;;;;redengine;;;;;;redengine
-;;;;;;;;cdpr;;;;;;cdpr
-;;;;;;;;intro;;;;;;intro
+cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr;cdpr
