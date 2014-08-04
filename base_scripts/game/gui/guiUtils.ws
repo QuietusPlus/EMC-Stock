@@ -73,7 +73,6 @@ import class CGuiUtils extends CObject
 	{
 		var itemName		: string			= inventory.GetItemName( itemId );
 		var itemCategory	: name				= inventory.GetItemCategory( itemId );
-		var itemSchemaCat	: name;
 		var itemMask		: int				= inventory.GetItemTypeFlags( itemId );
 		var itemRunes		: array< name >;
 		var itemOils		: array< SBuff >;
@@ -103,12 +102,9 @@ import class CGuiUtils extends CObject
 		var fullDescTootlip : string;
 		
 		var AS_schemPart	: int; // voSchematicPart
-		var TagCatTemp : string = "";
-		var TagWasSchematic : bool = false;
-		var TagCatName : string;
-		var TagCreatedItem : SItemUniqueId;
 		
 		inventory.GetItemTags( itemId, itemTags );
+
 		
 		if ( inventory.IsItemMounted( itemId ) || inventory.IsItemHeld( itemId ) || slotItems.Contains( itemId ) )
 		{
@@ -123,6 +119,7 @@ import class CGuiUtils extends CObject
 		//}
 		
 		theHud.SetFloat	( "ID",			itemIdx,										AS_item );
+		theHud.SetString( "Name",		GetLocStringByKeyExt( itemName ),				AS_item );
 		//theHud.SetString( "Name",		itemNameHtml,				AS_item );
 		//theHud.SetString( "Icon",		"icons/items/" + itemName + "_64x64.dds",		AS_item );
 		theHud.SetString( "Icon",		"img://globals/gui/icons/items/" + StrReplaceAll(itemName, " ", "") + "_64x64.dds",	AS_item );
@@ -131,81 +128,6 @@ import class CGuiUtils extends CObject
 		theHud.SetString( "Mask",		(string)itemMask,								AS_item );
 		theHud.SetFloat ( "Mass",		inventory.GetItemAttributeAdditive( itemId, 'item_weight' ), AS_item );
 		theHud.SetFloat	( "Price",		GetItemPrice( itemId, inventory ),	AS_item );
-		
-		if (itemCategory == 'schematic' ) {
-			itemSchemaCat = inventory.GetItemCategory( itemId );
-			craftedItemName = inventory.GetCraftedItemName( itemId );
-			TagCreatedItem = inventory.AddItem( craftedItemName, 1, false );
-			itemCategory = inventory.GetItemCategory( TagCreatedItem );
-			TagWasSchematic = true;
-		}
-		
-		if ( itemTags.Contains('SortTypeQuest') || itemCategory == 'quest') {
-			if ( itemCategory == 'key' ) {
-				TagCatTemp = GetLocStringByKeyExt( "type_key" );
-			} else {
-				TagCatTemp = GetLocStringByKeyExt( "type_quest" );
-			}
-		} else if ( itemCategory == 'armor' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_armor" );
-		} else if ( itemCategory == 'armorupgrade' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_armorupgr" );
-		} else if ( itemCategory == 'book' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_book" );
-		} else if ( itemCategory == 'boots' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_boots" );
-		} else if ( itemCategory == 'gloves' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_gloves" );
-		} else if ( itemCategory == 'lure' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_lure" );
-		} else if ( itemCategory == 'other' ) {
-			//if ( itemTags.Contains('Dismantle') ) {
-			//		TagCatTemp = GetLocStringByKeyExt( "[[locale.ov.lbdismantles]]" );
-			//	} else {
-					TagCatTemp = GetLocStringByKeyExt( "type_trash" );
-			//	}
-		} else if ( itemCategory == 'skillupgrade' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_mutagen" );
-		} else if ( itemCategory == 'weaponupgrade' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_grease" );
-		} else if ( itemCategory == 'pants' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_pants" );
-		} else if ( itemCategory == 'petard' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_bomb" );
-		} else if ( itemCategory == 'elixir' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_potion" );
-		} else if ( itemCategory == 'rangedweapon' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_thrown" );
-		} else if ( itemCategory == 'rune' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_rune" );
-		} else if ( itemCategory == 'silversword' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_swordsilver" );
-		} else if ( itemCategory == 'steelsword' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_swordsteel" );
-		} else if ( itemCategory == 'trap' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_trap" );
-		} else if ( itemCategory == 'trophy' ) {
-			TagCatTemp = GetLocStringByKeyExt( "type_trophy" );
-		} else if ( TagCatTemp == "" ) {
-			if ( itemCategory == 'alchemyingredient' ) {
-				TagCatTemp = GetLocStringByKeyExt( "[[locale.inv.listcraftingingredients]]" );
-			} else if ( itemCategory == 'craftingingredient' ) {
-				TagCatTemp = GetLocStringByKeyExt( "[[locale.inv.listcraftingingredients]]" );
-			}
-		}
-		
-		if ( TagWasSchematic ) {
-			// + ", " + GetLocStringByKeyExt("formulae");
-			itemCategory = itemSchemaCat;
-			inventory.RemoveItem( TagCreatedItem );
-			TagCatName = "(" + TagCatTemp + ") " + GetLocStringByKeyExt( craftedItemName );
-		} else if ( TagCatTemp == "" ) {
-			TagCatName = GetLocStringByKeyExt( itemName );
-		} else {
-			TagCatName = "(" + TagCatTemp + ") " + GetLocStringByKeyExt( itemName );
-		}
-	
-		theHud.SetString( "Name", TagCatName, AS_item );
 		
 		// Elixirs
 		if ( itemTags.Contains('Elixir') )
@@ -297,13 +219,7 @@ import class CGuiUtils extends CObject
 				AS_schemPart = theHud.CreateAnonymousObject();
 				
 				theHud.SetFloat(  "ID", 		0,																AS_schemPart );
-				
-				if ( itemTags.Contains('Dismantle') ) {
-					theHud.SetString( "Name", "(" + GetLocStringByKeyExt( "[[locale.ov.lbdismantles]]" ) + ") " + GetLocStringByKeyExt(ingredients[i].itemName), AS_schemPart );
-				} else {
-					theHud.SetString( "Name", "(" + GetLocStringByKeyExt( "[[locale.inv.listcraftingingredients]]" ) + ") " + GetLocStringByKeyExt(ingredients[i].itemName), AS_schemPart );
-				}
-				
+				theHud.SetString( "Name",  		GetLocStringByKeyExt(ingredients[i].itemName), 					AS_schemPart );
 				theHud.SetFloat(  "Count", 		ingredients[i].quantity, 										AS_schemPart );
 				theHud.SetString( "Icon",  		GetIngredientIconName( ingredients[i].itemName ), 				AS_schemPart );
 				theHud.SetFloat ( "Mass",  		GetItemNameMass( ingredients[i].itemName, inventory ), 			AS_schemPart );
