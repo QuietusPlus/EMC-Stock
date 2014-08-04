@@ -67,7 +67,100 @@ import class CGuiUtils extends CObject
 		
 		return output;
 	}
-
+	
+	function GetCustomTagName( inventory : CInventoryComponent, itemId : SItemUniqueId ) : string {
+		var itemSchemaCat		: name;
+		var TagCatTemp 		: string = "";
+		var TagWasSchematic 	: bool = false;
+		var TagCatName 		: string;
+		var TagCreatedItem 	: SItemUniqueId;
+		var itemCategory		: name = inventory.GetItemCategory( itemId );
+		var craftedItemName 	: name;
+		var itemName			: string = inventory.GetItemName( itemId );
+		var itemTags 			: array< name >;
+		
+		inventory.GetItemTags( itemId, itemTags );
+		
+		if (itemCategory == 'schematic' ) {
+			itemSchemaCat = inventory.GetItemCategory( itemId );
+			craftedItemName = inventory.GetCraftedItemName( itemId );
+			TagCreatedItem = inventory.AddItem( craftedItemName, 1, false );
+			itemCategory = inventory.GetItemCategory( TagCreatedItem );
+			TagWasSchematic = true;
+		}
+		
+		if ( itemTags.Contains('SortTypeQuest') || itemCategory == 'quest') {
+			if ( itemCategory == 'key' ) {
+				TagCatTemp = GetLocStringByKeyExt( "type_key" );
+			} else {
+				TagCatTemp = GetLocStringByKeyExt( "type_quest" );
+			}
+		} else if ( itemCategory == 'armor' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_armor" );
+		} else if ( itemCategory == 'armorupgrade' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_armorupgr" );
+		} else if ( itemCategory == 'book' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_book" );
+		} else if ( itemCategory == 'boots' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_boots" );
+		} else if ( itemCategory == 'gloves' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_gloves" );
+		} else if ( itemCategory == 'lure' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_lure" );
+		} else if ( itemCategory == 'other' ) {
+			//if ( itemTags.Contains('Dismantle') ) {
+			//		TagCatTemp = GetLocStringByKeyExt( "[[locale.ov.lbdismantles]]" );
+			//	} else {
+					TagCatTemp = GetLocStringByKeyExt( "type_trash" );
+			//	}
+		} else if ( itemCategory == 'skillupgrade' ) {
+			//if ( itemName == "Minor Mutagen of Amplification" || itemName == "Minor Mutagen of Range" || itemName == "Minor Mutagen of Critical Effect" || itemName == "Minor Mutagen of Vitality" || itemName == "Minor Mutagen of Power" || itemName == "Minor Mutagen of Strength" ) {
+			//	TagCatTemp = GetLocStringByKeyExt( "type_mutagen" ) + "";
+			//} else if ( itemName == "Mutagen of Mutagen of Insanity" || itemName == "Mutagen of Concentration" || itemName == "Major Mutagen of Strength" || itemName == "Major Mutagen of Power" || itemName == "Major Mutagen of Vitality" || itemName == "Major Mutagen of Critical Effect" || itemName == "Major Mutagen of Amplification" ) {
+			//	TagCatTemp = GetLocStringByKeyExt( "type_mutagen" ) + "";
+			//} else {
+				TagCatTemp = GetLocStringByKeyExt( "type_mutagen" ) + "";
+			//}
+		} else if ( itemCategory == 'weaponupgrade' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_grease" );
+		} else if ( itemCategory == 'pants' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_pants" );
+		} else if ( itemCategory == 'petard' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_bomb" );
+		} else if ( itemCategory == 'elixir' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_potion" );
+		} else if ( itemCategory == 'rangedweapon' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_thrown" );
+		} else if ( itemCategory == 'rune' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_rune" );
+		} else if ( itemCategory == 'silversword' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_swordsilver" );
+		} else if ( itemCategory == 'steelsword' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_swordsteel" );
+		} else if ( itemCategory == 'trap' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_trap" );
+		} else if ( itemCategory == 'trophy' ) {
+			TagCatTemp = GetLocStringByKeyExt( "type_trophy" );
+		} else if ( TagCatTemp == "" ) {
+			if ( itemCategory == 'alchemyingredient' ) {
+				TagCatTemp = GetLocStringByKeyExt( "[[locale.inv.listcraftingingredients]]" );
+			} else if ( itemCategory == 'craftingingredient' ) {
+				TagCatTemp = GetLocStringByKeyExt( "[[locale.inv.listcraftingingredients]]" );
+			}
+		}
+		
+		if ( TagWasSchematic ) {
+			itemCategory = itemSchemaCat;
+			inventory.RemoveItem( TagCreatedItem );
+			TagCatName = "(" + StrLeft( GetLocStringByKeyExt( "[[locale.inv.listcraftingingredients]]" ), 3 ) + ", " + StrLeft( TagCatTemp, 3) + ") " + GetLocStringByKeyExt( craftedItemName );
+		} else if ( TagCatTemp == "" ) {
+			TagCatName = GetLocStringByKeyExt( itemName );
+		} else {
+			TagCatName = "(" + StrLeft( TagCatTemp, 3) + ") " + GetLocStringByKeyExt( itemName );
+		}
+		return TagCatName;
+	}
+	
 	public final function FillItemObject( inventory : CInventoryComponent, stats : CCharacterStats, itemId : SItemUniqueId, itemIdx : int, AS_item : int, 
 										  slotItems : array< SItemUniqueId >, optional custom : name )
 	{
@@ -119,7 +212,7 @@ import class CGuiUtils extends CObject
 		//}
 		
 		theHud.SetFloat	( "ID",			itemIdx,										AS_item );
-		theHud.SetString( "Name",		GetLocStringByKeyExt( itemName ),				AS_item );
+		theHud.SetString( "Name",		GetCustomTagName( inventory, itemId ),				AS_item );
 		//theHud.SetString( "Name",		itemNameHtml,				AS_item );
 		//theHud.SetString( "Icon",		"icons/items/" + itemName + "_64x64.dds",		AS_item );
 		theHud.SetString( "Icon",		"img://globals/gui/icons/items/" + StrReplaceAll(itemName, " ", "") + "_64x64.dds",	AS_item );
@@ -219,7 +312,7 @@ import class CGuiUtils extends CObject
 				AS_schemPart = theHud.CreateAnonymousObject();
 				
 				theHud.SetFloat(  "ID", 		0,																AS_schemPart );
-				theHud.SetString( "Name",  		GetLocStringByKeyExt(ingredients[i].itemName), 					AS_schemPart );
+				theHud.SetString( "Name",  		GetCustomTagName( inventory, inventory.GetItemId( ingredients[i].itemName ) ), 					AS_schemPart );
 				theHud.SetFloat(  "Count", 		ingredients[i].quantity, 										AS_schemPart );
 				theHud.SetString( "Icon",  		GetIngredientIconName( ingredients[i].itemName ), 				AS_schemPart );
 				theHud.SetFloat ( "Mass",  		GetItemNameMass( ingredients[i].itemName, inventory ), 			AS_schemPart );
